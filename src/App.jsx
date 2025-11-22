@@ -8,6 +8,7 @@ import Perfil from "./pages/Perfil";
 import Admin from "./pages/Admin";
 import Login from "./pages/Login";
 import Registro from "./pages/Login";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function App() {
   return (

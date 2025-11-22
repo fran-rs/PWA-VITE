@@ -38,7 +38,7 @@ export default function Navbar({ onMenuClick }) {
             textAlign: "center",
           }}
         >
-          TruequeApp
+          Truekeo.cl
         </Typography>
 
         {/* Espacio para alinear el título centrado, sin botones a la derecha */}
