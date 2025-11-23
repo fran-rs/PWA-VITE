@@ -23,7 +23,7 @@ export const publicaciones = [
     titulo: "Monitor 24 pulgadas",
     descripcion: "Funciona perfecto, solo tiene un pixel muerto. Cambio por silla de escritorio.",
     imagen: "img/monitor.jpg",
-    categoria: "Tecnología",
+    categoria: "Tecnologia",
     interes: "Muebles",
     usuario: "DevMaster"
   },
@@ -32,7 +32,7 @@ export const publicaciones = [
     titulo: "Telefono Iphone 8",
     descripcion: "Funciona perfecto, solo tiene un pequeño detalle en la bateria. Cambio por xbox",
     imagen: "img/telefono.jpg",
-    categoria: "Tecnología",
+    categoria: "Tecnologia",
     interes: "Consolas",
     usuario: "DevMaster"
   },
@@ -59,7 +59,7 @@ export const publicaciones = [
     titulo: "Airpods Pro",
     descripcion: "No me gusatron, los cambio por unos Samsung Galaxy Buds.",
     imagen: "img/airpods.jpg",
-    categoria: "Tecnología",
+    categoria: "Tecnologia",
     interes: "Tecnología",
     usuario: "Franco Parisi"
   },
@@ -68,7 +68,7 @@ export const publicaciones = [
     titulo: "Placa de Video GTX 1060",
     descripcion: "La cambio por un algo de ineteres, escucho ofertas.",
     imagen: "img/gtx.jpg",
-    categoria: "Tecnología",
+    categoria: "Tecnologia",
     interes: "Todos",
     usuario: "Ricardo Lagos"
   },
@@ -86,7 +86,7 @@ export const publicaciones = [
     titulo: "Notebook Dell Inspiron",
     descripcion: "todo funciona perfecto, la cambio por una Macbook Air.",
     imagen: "img/inspiron.jpg",
-    categoria: "Tecnología",
+    categoria: "Tecnologia",
     interes: "Tecnología",
     usuario: "Rodrigo Solis"
   },
@@ -95,7 +95,7 @@ export const publicaciones = [
     titulo: "Ipad Pro 11 pulgadas",
     descripcion: "Funciona perfecto, lo cambio por una Samsung Galaxy Tab S7.",
     imagen: "img/ipad.jpg",
-    categoria: "Tecnología",
+    categoria: "Tecnologia",
     interes: "Tecnología",
     usuario: "Fernanda Lopez"
   }
