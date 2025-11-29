@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
 import {
-  Box,
   Button,
   TextField,
   Card,
   CardContent,
   Typography,
+  Box,
+  Link,
+  Alert,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../src/firebase";
 import { useAuth } from "../context/AuthContext";
 
 export function Login() {
@@ -23,6 +27,7 @@ export function Login() {
   });
 
   const [isValid, setIsValid] = useState(false);
+  const [firebaseError, setFirebaseError] = useState("");
 
   // Validación en tiempo real
   useEffect(() => {
@@ -41,12 +46,20 @@ export function Login() {
     setIsValid(emailError === "" && email.trim() !== "" && pass.trim() !== "");
   }, [email, pass, touched.email]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isValid) return;
 
-    login({ email });
-    navigate("/");
+    setFirebaseError("");
+
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+
+      login({ email });
+      navigate("/");
+    } catch (err) {
+      setFirebaseError("Correo o contraseña incorrectos");
+    }
   };
 
   return (
@@ -65,6 +78,12 @@ export function Login() {
           >
             Iniciar Sesión
           </Typography>
+
+          {firebaseError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {firebaseError}
+            </Alert>
+          )}
 
           <form onSubmit={handleSubmit}>
             <TextField
@@ -109,6 +128,31 @@ export function Login() {
               Entrar
             </Button>
           </form>
+
+          {/* Enlaces debajo */}
+          <Box sx={{ mt: 3, textAlign: "center" }}>
+            <Typography variant="body2">
+              ¿No tienes cuenta?{" "}
+              <Link
+                component="button"
+                underline="hover"
+                onClick={() => navigate("/registro")}
+                sx={{ fontWeight: "bold" }}
+              >
+                Registrarte
+              </Link>
+            </Typography>
+
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              <Link
+                component="button"
+                underline="hover"
+                onClick={() => console.log("Recuperar contraseña (luego)")}
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </Typography>
+          </Box>
         </CardContent>
       </Card>
     </Box>
