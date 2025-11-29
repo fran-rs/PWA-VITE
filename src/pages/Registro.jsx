@@ -1,5 +1,5 @@
 import Placeholder from "../components/Placeholder";
 
-export default function Home() {
+export function Registro() {
   return <Placeholder title="Registro" />;
 }

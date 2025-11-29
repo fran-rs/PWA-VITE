@@ -1,5 +1,5 @@
 import Placeholder from "../components/Placeholder";
 
-export default function Home() {
+export default function Admin() {
   return <Placeholder title="Admin" />;
 }
