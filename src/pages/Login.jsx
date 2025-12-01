@@ -10,8 +10,6 @@ import {
   Alert,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../src/firebase";
 import { useAuth } from "../context/AuthContext";
 
 export function Login() {
@@ -29,7 +27,6 @@ export function Login() {
   const [isValid, setIsValid] = useState(false);
   const [firebaseError, setFirebaseError] = useState("");
 
-  // Validación en tiempo real
   useEffect(() => {
     let emailError = "";
 
@@ -42,7 +39,6 @@ export function Login() {
     }
 
     setErrors({ email: emailError });
-
     setIsValid(emailError === "" && email.trim() !== "" && pass.trim() !== "");
   }, [email, pass, touched.email]);
 
@@ -53,9 +49,8 @@ export function Login() {
     setFirebaseError("");
 
     try {
-      await signInWithEmailAndPassword(auth, email, pass);
+      await login(email, pass); // <<<< ESTA ES LA ÚNICA LLAMADA REAL
 
-      login({ email });
       navigate("/");
     } catch (err) {
       setFirebaseError("Correo o contraseña incorrectos");
@@ -63,13 +58,7 @@ export function Login() {
   };
 
   return (
-    <Box
-      sx={{
-        mt: 10,
-        display: "flex",
-        justifyContent: "center",
-      }}
-    >
+    <Box sx={{ mt: 10, display: "flex", justifyContent: "center" }}>
       <Card sx={{ width: 350, p: 2, boxShadow: 4 }}>
         <CardContent>
           <Typography
@@ -129,7 +118,6 @@ export function Login() {
             </Button>
           </form>
 
-          {/* Enlaces debajo */}
           <Box sx={{ mt: 3, textAlign: "center" }}>
             <Typography variant="body2">
               ¿No tienes cuenta?{" "}
@@ -147,7 +135,7 @@ export function Login() {
               <Link
                 component="button"
                 underline="hover"
-                onClick={() => console.log("Recuperar contraseña (luego)")}
+                onClick={() => console.log("Recuperar contraseña")}
               >
                 ¿Olvidaste tu contraseña?
               </Link>
