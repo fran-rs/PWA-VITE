@@ -1,111 +1,176 @@
 import { useState } from "react";
-import { TextField, Button, Box, Typography, Alert } from "@mui/material";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  Alert,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../src/firebase"; // deja la importación tal como la tienes
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../src/firebase";
+
+// IMPORTS PARA STORAGE
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export function Registro() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [touched, setTouched] = useState(false);
+  const [form, setForm] = useState({
+    nombre: "",
+    email: "",
+    pass: "",
+    telefono: "",
+    direccion: "",
+  });
 
-  const handleRegister = async (e) => {
+  const [foto, setFoto] = useState(null); // archivo real
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleFile = (e) => {
+    setFoto(e.target.files[0]);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
+    setLoading(true);
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      setSuccess("Cuenta creada exitosamente 🎉");
-      setEmail("");
-      setPassword("");
-      setTouched(false);
+      // 1. Crear usuario en Authentication
+      const res = await createUserWithEmailAndPassword(
+        auth,
+        form.email,
+        form.pass
+      );
 
-      // Redirigir al home una vez creado el usuario
-      navigate("/");
+      const uid = res.user.uid;
+
+      // 2. Subir foto (si existe)
+      const storage = getStorage();
+      let fotoURL = "";
+
+      if (foto) {
+        const fotoRef = ref(storage, `usuarios/${uid}/perfil.jpg`);
+        await uploadBytes(fotoRef, foto);
+        fotoURL = await getDownloadURL(fotoRef);
+      }
+
+      // 3. Crear documento en Firestore
+      await setDoc(doc(db, "users", uid), {
+        uid,
+        nombre: form.nombre,
+        email: form.email,
+        telefono: form.telefono,
+        direccion: form.direccion,
+        fotoPerfil: fotoURL, // URL real de Firebase Storage
+        rol: "user",
+      });
+
+      navigate("/login");
     } catch (err) {
-      setError(err.message);
+      console.error(err);
+      setError("No se pudo registrar. Revisa los datos.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const isEmailValid = email.trim() !== "";
-  const isPasswordValid = password.trim() !== "";
-  const isFormValid = isEmailValid && isPasswordValid;
-
   return (
-    <Box
-      sx={{
-        maxWidth: 400,
-        mx: "auto",
-        mt: 10,
-        p: 3,
-        borderRadius: 2,
-        boxShadow: 3,
-        bgcolor: "white",
-      }}
-    >
-      <Typography variant="h5" textAlign="center" mb={2}>
-        Crear Cuenta
-      </Typography>
+    <Box sx={{ mt: 10, display: "flex", justifyContent: "center" }}>
+      <Card sx={{ width: 400, p: 3 }}>
+        <CardContent>
+          <Typography variant="h5" sx={{ textAlign: "center", mb: 2 }}>
+            Crear cuenta
+          </Typography>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-      {success && (
-        <Alert severity="success" sx={{ mb: 2 }}>
-          {success}
-        </Alert>
-      )}
+          {error && <Alert severity="error">{error}</Alert>}
 
-      <form onSubmit={handleRegister}>
-        <TextField
-          label="Correo"
-          fullWidth
-          margin="normal"
-          value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            setTouched(true);
-          }}
-          error={touched && !isEmailValid}
-          helperText={
-            touched && !isEmailValid ? "El correo es obligatorio" : ""
-          }
-        />
+          <form onSubmit={handleSubmit}>
+            <TextField
+              label="Nombre"
+              name="nombre"
+              fullWidth
+              margin="normal"
+              value={form.nombre}
+              onChange={handleChange}
+            />
 
-        <TextField
-          label="Contraseña"
-          type="password"
-          fullWidth
-          margin="normal"
-          value={password}
-          onChange={(e) => {
-            setPassword(e.target.value);
-            setTouched(true);
-          }}
-          error={touched && !isPasswordValid}
-          helperText={
-            touched && !isPasswordValid ? "La contraseña es obligatoria" : ""
-          }
-        />
+            <TextField
+              label="Correo"
+              name="email"
+              type="email"
+              fullWidth
+              margin="normal"
+              value={form.email}
+              onChange={handleChange}
+            />
 
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          fullWidth
-          sx={{ mt: 2 }}
-          disabled={!isFormValid}
-        >
-          Registrarme
-        </Button>
-      </form>
+            <TextField
+              label="Contraseña"
+              name="pass"
+              type="password"
+              fullWidth
+              margin="normal"
+              value={form.pass}
+              onChange={handleChange}
+            />
+
+            <TextField
+              label="Teléfono"
+              name="telefono"
+              fullWidth
+              margin="normal"
+              value={form.telefono}
+              onChange={handleChange}
+            />
+
+            <TextField
+              label="Dirección"
+              name="direccion"
+              fullWidth
+              margin="normal"
+              value={form.direccion}
+              onChange={handleChange}
+            />
+
+            {/* INPUT DE FOTO REAL */}
+            <Button
+              variant="outlined"
+              component="label"
+              fullWidth
+              sx={{ mt: 2 }}
+            >
+              Subir foto de perfil
+              <input type="file" hidden accept="image/*" onChange={handleFile} />
+            </Button>
+
+            {foto && (
+              <Typography sx={{ mt: 1 }} variant="body2">
+                Archivo seleccionado: {foto.name}
+              </Typography>
+            )}
+
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{ mt: 3 }}
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? "Creando cuenta..." : "Registrarse"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </Box>
   );
 }
