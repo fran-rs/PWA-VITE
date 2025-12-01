@@ -10,8 +10,8 @@ import { doc, getDoc } from "firebase/firestore";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null); // usuario de Authentication
-  const [profile, setProfile] = useState(null); // datos de Firestore
+  const [user, setUser] = useState(null); // Usuario de Authentication
+  const [profile, setProfile] = useState(null); // Datos de Firestore
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -41,7 +41,17 @@ export function AuthProvider({ children }) {
   const logout = () => signOut(auth);
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        setUser,
+        profile,
+        setProfile,
+        loading,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
