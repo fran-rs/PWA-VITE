@@ -1,7 +1,28 @@
-import { AppBar, Toolbar, IconButton, Typography } from "@mui/material";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+  Avatar,
+  Menu,
+  MenuItem,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Navbar({ onMenuClick }) {
+  const { profile, logout } = useAuth();
+  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const openMenu = (event) => setAnchorEl(event.currentTarget);
+  const closeMenu = () => setAnchorEl(null);
+
+  const initial = profile?.nombre?.charAt(0)?.toUpperCase() || "?";
+  const foto = profile?.fotoPerfil || "";
+
   return (
     <AppBar
       position="fixed"
@@ -30,19 +51,49 @@ export default function Navbar({ onMenuClick }) {
 
         <Typography
           variant="h6"
-          component="div"
-          sx={{
-            fontWeight: "bold",
-            letterSpacing: 1,
-            flexGrow: 1,
-            textAlign: "center",
-          }}
+          sx={{ fontWeight: "bold", flexGrow: 1, textAlign: "center" }}
         >
           Truekeo.cl
         </Typography>
 
-        {/* Espacio para alinear el título centrado, sin botones a la derecha */}
-        <div style={{ width: 48 }}></div>
+        {/* Avatar usuario */}
+        <IconButton onClick={openMenu}>
+          <Avatar
+            src={foto || null}
+            sx={{
+              bgcolor: foto ? "transparent" : "rgba(255,255,255,0.2)",
+              border: "2px solid rgba(255,255,255,0.7)",
+              color: "#fff",
+              width: 42,
+              height: 42,
+              fontSize: "1rem",
+            }}
+          >
+            {!foto && initial}
+          </Avatar>
+        </IconButton>
+
+        {/* Menú desplegable */}
+        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={closeMenu}>
+          <MenuItem
+            onClick={() => {
+              closeMenu();
+              navigate("/perfil");
+            }}
+          >
+            Ver perfil
+          </MenuItem>
+
+          <MenuItem
+            onClick={() => {
+              closeMenu();
+              logout();
+              navigate("/login");
+            }}
+          >
+            Cerrar sesión
+          </MenuItem>
+        </Menu>
       </Toolbar>
     </AppBar>
   );
